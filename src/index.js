@@ -1,5 +1,6 @@
 import React, { StrictMode } from "react";
 import { Canvas } from "@react-three/fiber";
+import { SoftShadows } from "@react-three/drei";
 import { Leva } from "leva";
 // import Experience from "./Experience.js";
 // import Experience from "./Experience_2.js";
@@ -8,6 +9,8 @@ import { createRoot } from "react-dom/client";
 import * as THREE from "three";
 import "./style.css";
 
+new THREE.Color();
+
 const root = createRoot(document.getElementById("root"));
 const cameraSettings = {
   fov: 45,
@@ -15,15 +18,11 @@ const cameraSettings = {
   far: 200,
   position: [-4, 3, 6],
 };
-
-const created = ({ gl, scene }) => {
-  // gl.setClearColor("lightblue");
-  scene.background = new THREE.Color("lightblue");
-};
 root.render(
   <StrictMode>
     <Leva collapsed />
     <Canvas
+      shadows
       flat
       camera={cameraSettings}
       gl={{
@@ -31,8 +30,8 @@ root.render(
         toneMapping: THREE.ACESFilmicToneMapping,
         outputColorSpace: THREE.sRGBEncoding,
       }}
-      onCreated={created}
     >
+      <SoftShadows size={0.005} near={9.5} samples={17} rings={11} />
       <Experience />
     </Canvas>
   </StrictMode>
