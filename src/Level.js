@@ -2,19 +2,49 @@ import * as THREE from "three";
 import { useMemo, useRef, useState } from "react";
 import { useFrame } from "@react-three/fiber";
 import { RigidBody, CuboidCollider } from "@react-three/rapier";
-import { useGLTF } from "@react-three/drei";
+import { useGLTF, Float, Text } from "@react-three/drei";
 
 THREE.ColorManagement.legacyMode = false;
 
 const boxGeometry = new THREE.BoxGeometry(1, 1, 1);
-const floor1Material = new THREE.MeshStandardMaterial({ color: "limegreen" });
-const floor2Material = new THREE.MeshStandardMaterial({ color: "greenyellow" });
-const obstacleMaterial = new THREE.MeshStandardMaterial({ color: "orangered" });
-const wallMaterial = new THREE.MeshStandardMaterial({ color: "slategrey" });
+const floor1Material = new THREE.MeshStandardMaterial({
+  color: "#111111",
+  metalness: 0,
+  roughness: 0,
+});
+const floor2Material = new THREE.MeshStandardMaterial({
+  color: "#222222",
+  metalness: 0,
+  roughness: 0,
+});
+const obstacleMaterial = new THREE.MeshStandardMaterial({
+  color: "teal",
+  metalness: 0,
+  roughness: 1,
+});
+const wallMaterial = new THREE.MeshStandardMaterial({
+  color: "#887777",
+  metalness: 0,
+  roughness: 0,
+});
 
 export function BlockStart({ position = [0, 0, 0] }) {
   return (
     <group position={position}>
+      <Float floatIntensity={0.25} rotationIntensity={0.25}>
+        <Text
+          font="./Bangers.ttf"
+          maxWidth={0.25}
+          lineHeight={0.75}
+          scale={0.5}
+          textAlign="right"
+          position={[0.75, 0.9, 0]}
+          rotation-y={-0.25}
+        >
+          开始冒险😁
+          <meshStandardMaterial toneMapped={false} />
+        </Text>
+      </Float>
       <mesh
         geometry={boxGeometry}
         material={floor1Material}
@@ -32,6 +62,20 @@ export function BlockEnd({ position = [0, 0, 0] }) {
   });
   return (
     <group position={position}>
+      <Float floatIntensity={0.25} rotationIntensity={0.25}>
+        <Text
+          font="./Bangers.ttf"
+          maxWidth={0.25}
+          lineHeight={0.75}
+          scale={0.5}
+          textAlign="right"
+          position={[0.75, 0.65, 0]}
+          rotation-y={-0.25}
+        >
+          🎉恭喜🎉
+          <meshStandardMaterial toneMapped={false} />
+        </Text>
+      </Float>
       <mesh
         geometry={boxGeometry}
         material={floor1Material}
@@ -202,6 +246,7 @@ export function Bounds({ length = 1 }) {
 export default function Level({
   count = 5,
   types = [BlockSpinner, BlockAxe, BlockLimbo],
+  seed = 0,
 }) {
   const blocks = useMemo(() => {
     const blocks = [];
@@ -210,7 +255,7 @@ export default function Level({
       blocks.push(type);
     }
     return blocks;
-  }, [count, types]);
+  }, [count, types, seed]);
   return (
     <>
       <BlockStart position={[0, 0, 0]} />

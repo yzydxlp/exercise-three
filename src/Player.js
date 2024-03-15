@@ -1,7 +1,8 @@
 import { useRef, useEffect, useState } from "react";
-import { useFrame } from "@react-three/fiber";
+import { addEffect, useFrame } from "@react-three/fiber";
 import { RigidBody, useRapier } from "@react-three/rapier";
 import { useKeyboardControls } from "@react-three/drei";
+import useGame from "./stores/useGame";
 import * as RAPIER from "@dimforge/rapier3d-compat";
 import * as THREE from "three";
 
@@ -14,6 +15,11 @@ export default function Player() {
   const [smoothedCameraPositon] = useState(() => new THREE.Vector3(10, 10, 10));
   const [smoothedCameraTarget] = useState(() => new THREE.Vector3());
 
+  const start = useGame((state) => state.start);
+  const end = useGame((state) => state.end);
+  const restart = useGame((state) => state.restart);
+  const blocksCount = useGame((state) => state.blocksCount);
+
   const jump = () => {
     const origin = body.current.translation();
     origin.y -= 0.31;
@@ -24,8 +30,14 @@ export default function Player() {
       body.current.applyImpulse({ x: 0, y: 0.5, z: 0 });
     }
   };
+  const reset = () => {
+    body.current.setTranslation({ x: 0, y: 1, z: 0 });
+    body.current.setLinvel({ x: 0, y: 0, z: 0 });
+    body.current.setAngvel({ x: 0, y: 0, z: 0 });
+  };
+
   useEffect(() => {
-    const unsubscribeJump = subscribeKeys(
+    const unSubscribeJump = subscribeKeys(
       (state) => state.jump,
       (value) => {
         if (value) {
@@ -33,7 +45,22 @@ export default function Player() {
         }
       }
     );
-    return () => unsubscribeJump();
+    const unSubscribeAnyKeys = subscribeKeys(() => {
+      start();
+    });
+    const unSubscribeReset = useGame.subscribe(
+      (state) => state.phase,
+      (value) => {
+        if (value === "ready") {
+          reset();
+        }
+      }
+    );
+    return () => {
+      unSubscribeJump();
+      unSubscribeAnyKeys();
+      unSubscribeReset();
+    };
   }, []);
 
   useFrame((state, delta) => {
@@ -88,6 +115,14 @@ export default function Player() {
 
     state.camera.position.copy(smoothedCameraPositon);
     state.camera.lookAt(smoothedCameraTarget);
+
+    if (bodyPosition.z < -(blocksCount * 4 + 2)) {
+      end();
+    }
+
+    if (bodyPosition.y < -4) {
+      reset();
+    }
   });
   return (
     <RigidBody

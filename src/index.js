@@ -4,6 +4,7 @@ import { SoftShadows } from "@react-three/drei";
 import { Leva } from "leva";
 import Experience from "./Experience_7.js";
 import { KeyboardControls } from "@react-three/drei";
+import Interface from "./Interface.js";
 import { createRoot } from "react-dom/client";
 import * as THREE from "three";
 import "./style.css";
@@ -39,5 +40,6 @@ root.render(
       <SoftShadows size={5} samples={17} />
       <Experience />
     </Canvas>
+    <Interface />
   </KeyboardControls>
 );
